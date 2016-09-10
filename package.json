@@ -4,6 +4,8 @@
   "description": "Web Application that helps users keep track of their BGG Challenges (10 x 10, 100 x 1, etc.)",
   "main": "app.js",
   "scripts": {
+    "precommit": "npm test",
+    "prepush": "npm test",
     "start": "node app",
     "test": "tape tests/**/*.js"
   },
@@ -27,6 +29,7 @@
     "css-loader": "^0.25.0",
     "eslint": "^3.5.0",
     "file-loader": "^0.9.0",
+    "husky": "^0.11.7",
     "style-loader": "^0.13.1",
     "tape": "^4.6.0",
     "testdouble": "^1.6.1",
