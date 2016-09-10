@@ -4,7 +4,8 @@
   "description": "Web Application that helps users keep track of their BGG Challenges (10 x 10, 100 x 1, etc.)",
   "main": "app.js",
   "scripts": {
-    "start": "node app"
+    "start": "node app",
+    "test": "tape tests/**/*.js"
   },
   "repository": {
     "type": "git",
@@ -27,6 +28,8 @@
     "eslint": "^3.5.0",
     "file-loader": "^0.9.0",
     "style-loader": "^0.13.1",
+    "tape": "^4.6.0",
+    "testdouble": "^1.6.1",
     "url-loader": "^0.5.7",
     "webpack": "^1.13.2",
     "webpack-dev-middleware": "^1.6.1",
