@@ -3,12 +3,14 @@ var fs = Promise.promisifyAll(require('fs'));
 
 module.exports = {
 
-  load: (path) => {
-    fs.readFileAsync(path).then((data) => JSON.parse(data));
+  load: function(path) {
+    return fs.readFileAsync(path).then(function(data) {
+      return JSON.parse(data);
+    });
   },
 
-  save: (path, data) => {
-    fs.writeFileAsync(path, JSON.stringify(data));
+  save: function(path, data) {
+    return fs.writeFileAsync(path, JSON.stringify(data));
   }
 
 };

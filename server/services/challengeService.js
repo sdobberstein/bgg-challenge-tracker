@@ -1,8 +1,9 @@
 var _ = require('lodash');
 var jsonFiles = require('../utils/jsonFiles');
+var idGenerator = require('../utils/idGenerator');
 var path = require('path');
 
-var CHALLENGES_FILE = path.join('..', 'data', 'challenges.json');
+var CHALLENGES_FILE = path.join(__dirname, '..', 'data', 'challenges.json');
 
 function findChallenge(challenges, id) {
   return _.find(challenges, (challenge) => challenge.id === id);
@@ -17,14 +18,18 @@ function getChallengeById(id) {
 }
 
 function saveChallenge(challenge) {
+  if (!challenge.id) {
+    challenge.id = idGenerator.generate();
+  }
+
   return getAllChallenges().then((challenges) => {
     var foundChallenge = findChallenge(challenges, challenge.id);
     if (foundChallenge) {
-      foundChallenge = challenge;
+      foundChallenge = _.extend(foundChallenge, challenge);
     } else {
       challenges.push(challenge);
     }
-    return jsonFiles.save(CHALLENGES_FILE, challenges);
+    return jsonFiles.save(CHALLENGES_FILE, challenges).then(() => challenge);
   });
 }
 

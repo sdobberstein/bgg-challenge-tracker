@@ -1,6 +1,7 @@
 var path = require('path');
 var express = require('express');
 var httpProxy = require('http-proxy');
+var bodyParser = require('body-parser');
 
 var isProduction = process.env.NODE_ENV === 'production';
 var port = isProduction ? process.env.PORT : 3000;
@@ -11,6 +12,9 @@ var proxy = httpProxy.createProxyServer();
 
 // serve up static files
 app.use(express.static(publicPath));
+
+// parse JSON
+app.use(bodyParser.json());
 
 // We only want to run the workflow when not in production
 if (!isProduction) {
@@ -31,6 +35,8 @@ if (!isProduction) {
     });
   });
 }
+
+app.use('/api/v1/challenges', require('./server/routers/challenges'));
 
 // It is important to catch any errors from the proxy or the
 // server will crash. An example of this is connecting to the
