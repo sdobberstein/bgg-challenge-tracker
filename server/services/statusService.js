@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var Promise = require('bluebird');
 var bggService = require('./bggService');
 var challengeService = require('./challengeService');
 
@@ -39,6 +40,35 @@ function mergePlayCountsIntoChallenge(results, username) {
   return _.extend(copy, { username });
 }
 
+function enrichWithBoardGameNames(challengeStatus) {
+  var copy = _.cloneDeep(challengeStatus);
+  var items = copy.items;
+  var firstItem = _.first(items);
+  var promises = [];
+  var initialPromise = getBoardGameName(firstItem);
+
+  promises.push(initialPromise);
+
+  return initialPromise.then(function() {
+    var remainingItems = _.tail(items);
+    if (remainingItems) {
+      remainingItems.forEach(function(item) {
+        promises.push(getBoardGameName(item));
+      });
+    }
+
+    return Promise.all(promises).then(function(items) {
+      return _.extend(copy, {items});
+    });
+  });
+}
+
+function getBoardGameName(item) {
+  return bggService.boardgameName(item.id).then(function(name) {
+    return _.extend({}, item, {name});
+  });
+}
+
 module.exports = {
 
   getChallengeStatus: function(challengeId, username) {
@@ -63,6 +93,9 @@ module.exports = {
       })
       .then(function(results) {
         return mergePlayCountsIntoChallenge(results, username);
+      })
+      .then(function(results) {
+        return enrichWithBoardGameNames(results);
       });
   }
 

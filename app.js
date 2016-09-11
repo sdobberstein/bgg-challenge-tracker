@@ -16,6 +16,9 @@ app.use(express.static(publicPath));
 // parse JSON
 app.use(bodyParser.json());
 
+// pretty print json locally
+app.set('json spaces', 2);
+
 // We only want to run the workflow when not in production
 if (!isProduction) {
   // We require the bundler inside the if block because
@@ -23,9 +26,6 @@ if (!isProduction) {
   // you will see why this is a good idea
   var bundle = require('./server/bundle.js');
   bundle();
-
-  // pretty print json locally
-  app.set('json spaces', 2);
 
   // Any requests to localhost:3000/build is proxied
   // to webpack-dev-server
