@@ -2,8 +2,10 @@ var _ = require('lodash');
 var express = require('express');
 var router = express.Router();
 var challengeService = require('../services/challengeService');
+var statusService = require('../services/statusService');
 var validate = require('express-jsonschema').validate;
 
+// TODO: pull this out into it's own file so we can test the schema
 var ChallengeSchema = {
   type: 'object',
   properties: {
@@ -14,7 +16,7 @@ var ChallengeSchema = {
         type: 'object',
         properties: {
           id: {
-            type: 'string',
+            type: 'number',
             required: true
           },
           targetPlays: {
@@ -63,9 +65,20 @@ router.get('/:id', (req, res) => {
   });
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', validate({ body: ChallengeSchema }), (req, res) => {
+  req.body.id = req.params.id;
   challengeService.saveChallenge(req.body).then((challenge) => {
     res.json(challenge);
+  });
+});
+
+router.get('/:id/status', (req, res) => {
+  if (!req.query.username) {
+    res.sendStatus(400);
+  }
+
+  statusService.getChallengeStatus(req.params.id, req.query.username).then((results) => {
+    res.json(results);
   });
 });
 
