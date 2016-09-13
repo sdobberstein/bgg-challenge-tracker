@@ -87,13 +87,12 @@ module.exports = {
       })
       .then(function(results) {
         var itemIds = _.map(results.challenge.items, 'id');
-        return playMatcher.getMatches({
+        var matchedPlays = playMatcher.getMatches({
           filters: _.extend({}, results.challenge.filters, { incomplete: 0, itemIds: itemIds }),
           plays: results.plays
-        }).then(function(matchingPlays) {
-          var transformedPlays = matchingPlays.map(function(play) { return { id: play.item.objectid, quantity: play.quantity }; });
-          return _.extend(results, { plays: transformedPlays });
         });
+        var transformedPlays = matchedPlays.map(function(play) { return { id: play.item.objectid, quantity: play.quantity }; });
+        return _.extend(results, { plays: transformedPlays });
       })
       .then(function(results) {
         return _.extend(results, { plays: countPlays(results.plays) });

@@ -23,23 +23,20 @@ const FILTERS = {
     };
   }
 };
-const AVAILABLE_FILTERS = Object.keys(FILTERS);
+const APPILCABLE_FILTERS = Object.keys(FILTERS);
 
 module.exports = {
 
-  getMatches: function(config) {
-    return new Promise(function(resolve) {
-      var filters = _.pick(config.filters || {}, AVAILABLE_FILTERS);
-      var plays = config.plays ? _.cloneDeep(config.plays) : [];
-      var filterFunctions = [];
-      _(filters).forOwn(function(value, key) {
-        if (FILTERS[key]) {
-          filterFunctions.push(FILTERS[key](value));
-        }
-      });
+  getMatches: function({ filters = {}, plays = [] }) {
+    const applicableFilters = _.pick(filters, APPILCABLE_FILTERS);
+    const clonedPlays = _.cloneDeep(plays);
+    let filterFunctions = [];
 
-      resolve(plays.filter(Predicates.all(filterFunctions)));
+    _(applicableFilters).forOwn((value, key) => {
+      FILTERS[key] && filterFunctions.push(FILTERS[key](value));
     });
+
+    return clonedPlays.filter(Predicates.all(filterFunctions));
   }
 
 };
