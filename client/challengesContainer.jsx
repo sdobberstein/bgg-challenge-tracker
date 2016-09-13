@@ -2,7 +2,7 @@ import React from 'react';
 import $ from 'jquery';
 import Challenges from './challenges.jsx';
 
-export default class ChallengeContainer extends React.Component {
+export default class ChallengesContainer extends React.Component {
   constructor(props) {
     super(props);
     this.state = { challenges: [] };

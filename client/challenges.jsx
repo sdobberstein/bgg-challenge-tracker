@@ -9,7 +9,7 @@ export default class Challenges extends React.Component {
   render() {
     const challenges = this.props.challenges.map(function(challenge) {
       return (
-        <li>
+        <li key={challenge.id}>
           <Link to={{ pathname: `/challenges/${challenge.id}` }}>{challenge.id}</Link>
         </li>
       );

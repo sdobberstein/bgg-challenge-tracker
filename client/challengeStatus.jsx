@@ -36,7 +36,7 @@ export default class ChallengeStatus extends React.Component {
     return (
       <div>
         <h3>Challenge Status for {this.props.challengeStatus.username}</h3>
-        <table className="challenge-status-items">
+        <table className="challenge-items">
           <thead>
             <tr>
               <th>Game</th>

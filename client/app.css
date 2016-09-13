@@ -1,15 +1,48 @@
-.challenge-status-items,
-.challenge-status-items th,
-.challenge-status-items td {
+.username-chooser {
+	margin-top: 20px;
+}
+
+.username-chooser > label,
+.username-chooser > input {
+	margin-right: 10px;
+}
+
+.username-chooser > label:after {
+	content: ':';
+}
+
+.link-btn {
+	background-color: hsl(208, 50%, 49%);
+	border: 1px solid hsl(208, 56%, 52%);
+	border-radius: 5px;
+	color: hsl(0, 0%, 100%);
+	padding: 4px;
+	text-decoration: none;
+}
+
+.link-btn:hover {
+	background-color: hsl(208, 80%, 60%);
+	border: 1px solid hsl(208, 86%, 63%);
+}
+
+.link-btn.disabled {
+	background-color: hsl(0, 0%, 75%);
+	border: 1px solid hsl(0, 0%, 78%);
+	pointer-events: none;
+}
+
+.challenge-items,
+.challenge-items th,
+.challenge-items td {
 	border: 1px solid black;
 }
 
-.challenge-status-items {
+.challenge-items {
 	border-collapse: collapse;
 }
 
-.challenge-status-items th,
-.challenge-status-items td {
+.challenge-items th,
+.challenge-items td {
 	padding: 5px;
 }
 
