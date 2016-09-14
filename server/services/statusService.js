@@ -1,73 +1,32 @@
 var _ = require('lodash');
 var Promise = require('bluebird');
-var bggService = require('./bggService');
+var boardGameService = require('./boardGameService');
 var challengeService = require('./challengeService');
 var playMatcher = require('../utils/playMatcher');
-
-function completed(play) {
-  return play.incomplete === 0;
-}
-
-function matches(itemIds) {
-  return function(play) {
-    return _(itemIds).includes(play.item.objectid);
-  };
-}
-
-function getMatchingPlays(plays, itemIds) {
-  var matchesGame = matches(itemIds);
-  return _
-    .chain(plays)
-    .filter(function(play) { return completed(play) && matchesGame(play); })
-    .map(function(play) { return { id: play.item.objectid, quantity: play.quantity }; })
-    .value();
-}
 
 function countPlays(plays) {
   return _
     .chain(plays)
-    .groupBy('id')
-    .mapValues(function(quantities) { return quantities.reduce(function(sum, n) { return sum + n.quantity; }, 0); })
+    .groupBy('boardGameId')
+    .mapValues(function(quantities) {
+      return quantities.reduce(function(obj, n) {
+        obj.boardGameName = n.boardGameName;
+        obj.quantity += n.quantity;
+        return obj;
+      }, { quantity: 0 });
+    })
     .value();
 }
 
-function mergePlayCountsIntoChallenge(results, username) {
-  var copy = _.cloneDeep(results.challenge);
+function mergePlayCountsIntoChallenge({challenge, plays}, username) {
+  var copy = _.cloneDeep(challenge);
   copy.items = _.map(copy.items, function(item) {
     return _.extend(item, {
-      completedPlays: results.plays[item.id] || 0
+      completedPlays: plays[item.id] ? plays[item.id].quantity : 0,
+      name: plays[item.id] ? plays[item.id].boardGameName : 'N/A'
     });
   });
   return _.extend(copy, { username });
-}
-
-function enrichWithBoardGameNames(challengeStatus) {
-  var copy = _.cloneDeep(challengeStatus);
-  var items = copy.items;
-  var firstItem = _.first(items);
-  var promises = [];
-  var initialPromise = getBoardGameName(firstItem);
-
-  promises.push(initialPromise);
-
-  return initialPromise.then(function() {
-    var remainingItems = _.tail(items);
-    if (remainingItems) {
-      remainingItems.forEach(function(item) {
-        promises.push(getBoardGameName(item));
-      });
-    }
-
-    return Promise.all(promises).then(function(items) {
-      return _.extend(copy, {items});
-    });
-  });
-}
-
-function getBoardGameName(item) {
-  return bggService.boardgameName(item.id).then(function(name) {
-    return _.extend({}, item, {name});
-  });
 }
 
 module.exports = {
@@ -76,8 +35,8 @@ module.exports = {
     return challengeService
       .getChallengeById(challengeId)
       .then(function(challenge) {
-        return bggService
-          .plays(_.extend({}, challenge.filters, { username }))
+        return boardGameService
+          .getAllPlays(_.extend({}, challenge.filters, { username }))
           .then(function(plays) {
             return {
               challenge: challenge,
@@ -88,20 +47,16 @@ module.exports = {
       .then(function(results) {
         var itemIds = _.map(results.challenge.items, 'id');
         var matchedPlays = playMatcher.getMatches({
-          filters: _.extend({}, results.challenge.filters, { incomplete: 0, itemIds: itemIds }),
+          filters: _.extend({}, results.challenge.filters, { complete: true, boardGameIds: itemIds }),
           plays: results.plays
         });
-        var transformedPlays = matchedPlays.map(function(play) { return { id: play.item.objectid, quantity: play.quantity }; });
-        return _.extend(results, { plays: transformedPlays });
+        return _.extend(results, { plays: matchedPlays });
       })
       .then(function(results) {
         return _.extend(results, { plays: countPlays(results.plays) });
       })
       .then(function(results) {
         return mergePlayCountsIntoChallenge(results, username);
-      })
-      .then(function(results) {
-        return enrichWithBoardGameNames(results);
       });
   }
 

@@ -3,23 +3,19 @@ var Promise = require('bluebird');
 var Predicates = require('./predicates');
 
 const FILTERS = {
-  'incomplete': function(incomplete) {
+  'complete': function(complete) {
     return function(play) {
-      return play.incomplete === incomplete;
+      return play.complete === complete;
     }
   },
-  'itemIds': function(itemIds) {
+  'boardGameIds': function(boardGameIds) {
     return function(play) {
-      return _(itemIds).includes(play.item.objectid);
+      return _(boardGameIds).includes(play.boardGameId);
     };
   },
-  'playerCount': function(count) {
+  'numberOfPlayers': function(numberOfPlayers) {
     return function(play) {
-      var players = play.players.player;
-      if (!_.isArray(players)) {
-        players = [players];
-      }
-      return players.length === count;
+      return play.numberOfPlayers === numberOfPlayers;
     };
   }
 };

@@ -1,24 +1,25 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
+const bgg = require('bgg')();
 
 const MAX_PAGES = 10;
 const APPICABLE_PLAY_PARAMS = ['username', 'mindate', 'maxdate', 'page'];
 
 module.exports = {
 
-  getBoardGame: (id) => {
+  getBoardGame: function(id) {
     return bgg('thing', { id, type: 'boardgame' }).then((results) => {
       return results.items.item;
     });
   },
 
-  getAllPlays: (params) => {
+  getAllPlays: function(params) {
     const options = _.pick(params, APPICABLE_PLAY_PARAMS);
     const initialPromise = this.getPaginatedPlays(options);
     const promises = [initialPromise];
 
     return initialPromise.then((paginatedPlays) => {
-      const plays = data.plays || {};
+      const plays = paginatedPlays.plays || {};
       const pages = Math.min(MAX_PAGES, Math.ceil(plays.total / 100));
       if (pages > 1) {
         for (let i = 1; i < pages; i++) {
@@ -36,11 +37,11 @@ module.exports = {
     });
   },
 
-  getPaginatedPlays: (params) => {
+  getPaginatedPlays: function(params) {
     return bgg('plays', params);
   },
 
-  getPlays: (params) => {
+  getPlays: function(params) {
     return this.getPaginatedPlays(params).then((results) => {
       return ((results.plays && results.plays.play) ? results.plays.play : []);
     });

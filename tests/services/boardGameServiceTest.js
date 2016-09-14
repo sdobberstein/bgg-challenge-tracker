@@ -38,11 +38,12 @@ test('board game that has multipe names gets the primary name extracted', (t) =>
 
 test('can get all plays for a user', (t) => {
   td.replace(bggService, 'getAllPlays');
-  td.when(bggService.getAllPlays({ username: 'gpburde' })).thenResolve([{ quantity: 3, item: { name: 'Foo', objectid: 1234 }, players: [{}, {}] }]);
+  td.when(bggService.getAllPlays({ username: 'gpburde' })).thenResolve([{ quantity: 3, incomplete: 0, item: { name: 'Foo', objectid: 1234 }, players: { player: [{}, {}] } }]);
 
   boardGameService.getAllPlays({ username: 'gpburde' }).then((plays) => {
     t.equal(plays.length, 1, 'there should be one play');
     t.equal(plays[0].quantity, 3, 'the game was played 3 times');
+    t.true(plays[0].complete, 'the game is complete');
     t.equal(plays[0].boardGameName, 'Foo', 'the game is named Foo');
     t.equal(plays[0].boardGameId, 1234, 'the board game has an id of 1234');
     t.equal(plays[0].numberOfPlayers, 2, 'there were two players in the game');

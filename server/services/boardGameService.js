@@ -27,9 +27,10 @@ module.exports = {
       return plays.map((play) => {
         return {
           quantity: play.quantity,
+          complete: play.incomplete === 0 ? true : false,
           boardGameName: play.item.name,
           boardGameId: play.item.objectid,
-          numberOfPlayers: _.isArray(play.players) ? play.players.length : 1
+          numberOfPlayers: _.isArray(play.players.player) ? play.players.player.length : 1
         };
       });
     });
